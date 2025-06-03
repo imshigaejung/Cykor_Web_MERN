@@ -1,52 +1,87 @@
 const Room = require('../schema/room_schema');
-const userService = require('../services/service_user')
+const userService = require('../services/service_user');
 const roomService = require('../services/service_room');
+const verify = require('../services/service_verify');
+const { BadRequestError } = require('../services/service_error');
 
 exports.makeRoom = async (req, res, next) => {
     try{
         const roomData = req.body;
-        return res.status(201).json(await roomService.createRoom(roomData));
-    } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        await roomService.createRoom(roomData)
+        //생성성 성공
+        return res.status(201).json({message: "Creation complete"});
+    } catch(error) {
+        return res.status(error.statusCode).json({error: error.message});
     }
     
 };
 
 exports.profileRoom = async (req, res, next) => {
     try{
-        const userId = req.params.id;
-        return await res.status(200).json(userService.readUsers("_id", userId));
-    } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        const roomId = req.params.id;
+        await roomService.readRoom("_id", roomId);
+        //불러오기 성공
+        return res.status(200).json({message: "Reading Complete"});
+    } catch(error) {
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
 
 exports.inviteToRoom = async (req, res, next) => {
     try{
         const roomId = req.params.id;
-        //members는 배열로 전달해야 함
         const userIds = req.body.members;
+        //members는 배열로 전달해야 함
         if(!Array.isArray(userIds)){
-            return res.status(400).json({err: 'Members must be array'});
+            throw new BadRequestError("Members must be Array");
         }
-        const updatedUser = userIds.map(userId =>
-            userService.updateUser(userId,)
-        )
-        return await Promise.all([
-            res.status(200).json(roomService.editUsers(roomId,userIds)),
-            res.status(200).json(userService)
-        ])
+        //초대 된 모든 사용자에게 초대 된 채팅방 id 저장 
+        await Promise.all(
+            userIds.map(userId => userService.updateUser(userId, {myRooms: [roomId]}, "insert")),
+        );
+        //방 정보에 초대 된 사용자 정보 저장
+        await roomService.updateRoom(roomId, {members: [userIds]}, "insert");   
 
-
-    } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        //수정 성공
+        return res.status(200).json({message: 'Update complete'});
+    } catch(error) {
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
 
 exports.destroyRoom = async (req, res, next) => {
     try{
+        const roomId = req.params.id;
+        const currentRoom = await roomService.readRoom("_id", roomId);
+        if(verify.verifyHost(roomId, req.session.userId)){
+            await Promise.all(
+            currentRoom.members.map(userId => userService.updateUser(userId, {myRooms: [roomId]},"delete"))
+            );
+            await roomService.deleteRoom(roomId);
+            //삭제 성공
+            return res.status(200).json({message: 'Delete complete'});
+        }
+        else{
+            throw new BadRequestError('Only host can delete the room');
+        }
         
-    } catch {
-        return res.status(400).json({err: 'Invalid action'});
+    } catch(error) {
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
+
+exports.listRoom = async(req, res, next) => {
+    try{
+        const currentUser = await userService.readUser("_id",req.session.userId);
+        const myRoomsId = currentUser.myRooms;
+        const myRoomNames = await Promise.all(
+            myRoomsId.map(async myRoomId => {
+                const myRoom = await roomService.readRoom("_id", myRoomId);
+                return myRoom.name;
+            }),
+        );
+        return res.status(200).json({message: "Listing my rooms complete"});
+    } catch(error) {
+        return res.status(error.statusCode).json({error: error.message});
+    }
+}

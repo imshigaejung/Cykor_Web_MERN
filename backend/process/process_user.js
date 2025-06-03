@@ -1,48 +1,52 @@
 const userSchema = require('../schema/user_schema');
+const { NotFoundError, BadRequestError } = require('../services/service_error');
 const userService = require('../services/service_user');
 const verify = require('../services/service_verify');
 
 exports.signupUser = async (req, res, next) => {
     try{
         const userData = req.body;
-        const user = await verify.verifyUsername(userData.name)
+        const user = await verify.verifyUserstringId(userData.stringId)
         if(user){
-            return res.status(400).json({err: 'Existing name'});
+            throw new BadRequestError('Existing name');
         } else {
-        return res.status(201).json(await userService.createUser(userData));
+        await userService.createUser(userData)
+        //생성 성공
+        return res.status(201).json({message: "Creation complete"});
         }
     } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
 
 exports.loginUser = async (req, res, next) => {
     try{
         const userData = req.body;
-        const user = await verify.verifyUsername(userData.name);
-        console.log(user);
+        const user = await verify.verifyUserstringId(userData.stringId);
         if(!user){
-            return res.status(400).json({err: 'User not found'});
+            throw new NotFoundError('User not found');
         } else {
             if(await verify.verifyPassword(userData.password, user.password)){
-
-                //updateUser  관련 수정 필요
-                return res.status(201).json(await userService.updateUser(userData));
+                await userService.updateUser(userData);
+                req.session.userId = req.body._id;
+                //수정 성공
+                return res.status(200).json({message: "Login complete"});
             }
-            else return res.status(400).json({err: 'Wrong password'});
+            throw new BadRequestError('Wrong password');
         }
-    }catch{
-        return res.status(400).json({err: 'Invalid action'});
+    }catch(error){
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
 
 exports.profileUser = async (req, res, next) => {
-    res.send('profile compliance');
     try{
         const userId = req.params.id;
-        return await res.status(200).json(userService.readUsers("_id", userId));
+        await userService.readUsers("_id", userId)
+        //불러오기 성공
+        return res.status(200).json({message: "Profile loading complete"});
     } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
 
@@ -50,20 +54,23 @@ exports.searchUser = async (req, res, next) => {
     res.send('search compliance');
     try{
         const userName = req.query.search;
-        return await res.status(200).json(userService.readUsers("name", userName));
+        await userService.readUsers("name", userName);
+        //불러오기 성공
+        return res.status(200).json({message: "Search complete"});
     } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        return res.status(error.statusCode).json({error: error.message});
     }
 };
 
 exports.editUser = async (req, res, next) => {
-    res.send('edit compliance');
     try{
-        const userId = req.params.Id;
+        const userId = req.params.id;
         const userData = req.body;
-        return await res.status(200).json(userService.updateUser(userId, userData));
-    } catch {
-        return res.status(400).json({err: 'Invalid action'});
+        await userService.updateUser(userId, userData)
+        //수정 성공
+        return res.status(200).json({message: 'edit complete'});
+    } catch(error) {
+        return res.status(error.statusCode).json({err: error.message});
     }
 };
 

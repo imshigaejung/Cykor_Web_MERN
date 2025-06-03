@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
     
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true},
+    stringId: {type: String, requried: true},
     password: {type: String, required: true}, 
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     is_Login: {type: Boolean, default: false},

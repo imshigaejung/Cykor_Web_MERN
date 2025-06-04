@@ -31,7 +31,6 @@ exports.updateUser = async (userId, userData, command) => {
     let updatedData = {};   
     if (userData.name !== undefined) updatedData.name = userData.name;
     if (userData.stringId !== undefined) updatedData.stringId = userData.stringId;
-    if (userData.is_Login !== undefined) updatedData.is_Login = userData.is_Login;
             
     //비밀번호 해싱
     if (userData.password) {

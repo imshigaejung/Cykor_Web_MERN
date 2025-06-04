@@ -37,3 +37,9 @@ exports.verifyIsLogin = async(req, res, next) => {
     }
     next();
 }
+
+exports.verifyIsEmpty = async(value) => {
+    if(!value){
+        throw new NotFoundError("There Is No Input");
+    }
+}

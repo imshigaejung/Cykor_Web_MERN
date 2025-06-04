@@ -9,6 +9,7 @@ roomRouter.get('/list', roomProcess.listRoom);
 
 roomRouter.patch('/invite/:roomId', roomProcess.inviteToRoom);
 
+roomRouter.delete('/leave/:roomId', roomProcess.leaveRoom);
 roomRouter.delete('/delete/:roomId', roomProcess.destroyRoom);
 
 

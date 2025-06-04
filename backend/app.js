@@ -12,13 +12,13 @@ const verify = require('./services/service_verify');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
-//connection
+//connection - cors setting
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
 //db connection
 connectDB();
 
-//session activation
+//session setting
 app.use(session({
   secret: 'your-secret',
   resave: false,
@@ -29,7 +29,7 @@ app.use(session({
 //routing
 app.use('/api',routes);
 app.use((err, req, res, next) => {
-  res.status(err.statusCode).json(err.message);
+  res.status(err.statusCode).json({error: err.message});
 });
 //root dir process
 app.get('/', (req, res) => {

@@ -89,3 +89,22 @@ exports.listRoom = async(req, res, next) => {
        next(error);
     }
 }
+
+//delete
+exports.leaveRoom= async(req, res, next) => {
+    try{
+        const roomId = req.params.id;
+        const userId = req.session.userId;
+
+        //사용자의 방 목록에서 해당 방 삭제
+        await userService.updateUser(userId, {myRooms: [roomId]}, "delete");
+        
+        //방의 사용자 목록에서 해당 사용자 삭제
+        await roomService.updateRoom(roomId, {members: userId}, "delete");   
+
+        //수정 성공
+        return res.status(200).json({message: 'Update complete'});
+    } catch(error) {
+        next(error);
+    }
+}

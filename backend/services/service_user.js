@@ -1,12 +1,14 @@
-const userSchema = require('../schema/user_schema');
+const User = require('../schema/user_schema');
+const bcrypt = require('bcrypt');
 const {ServerError, NotFoundError, BadRequestError} = require('../services/service_error');
 
 exports.createUser = async (userData) => {
-    const result = new User(userData);
-    if(!result){
+    try{
+        const result = new User(userData);    
+        return await result.save();
+    } catch {
         throw new ServerError("Creation failure");
-    } 
-    return await result.save();
+    }
 };
 
 exports.readUser = async (key, value) => {
@@ -30,7 +32,6 @@ exports.updateUser = async (userId, userData, command) => {
     if (userData.name !== undefined) updatedData.name = userData.name;
     if (userData.stringId !== undefined) updatedData.stringId = userData.stringId;
     if (userData.is_Login !== undefined) updatedData.is_Login = userData.is_Login;
-    if (userData.createdAt !== undefined) updatedData.createdAt = userData.createdAt;
             
     //비밀번호 해싱
     if (userData.password) {
@@ -38,10 +39,9 @@ exports.updateUser = async (userId, userData, command) => {
         updatedData.password = await bcrypt.hash(userData.password, salt);
     }
 
-    //안정성을 위해 우선 초기화
-    let result = {};
+    let result;
 
-    //배열에 요소를 추가할지 삭제할지 결정
+    //배열에 요소를 추가하는 경우
     if(command == "insert"){
         result = await User.findByIdAndUpdate(userId, {
             $set: updatedData,
@@ -52,6 +52,7 @@ exports.updateUser = async (userId, userData, command) => {
         }, 
         {new: true}
         );
+        //배열에 요소를 삭제하는 경우
     } else if(command == "delete"){
         result = await User.findByIdAndUpdate(userId, {
             $set: updatedData,
@@ -62,17 +63,29 @@ exports.updateUser = async (userId, userData, command) => {
         }, 
         {new: true}
         );
+        //배열을 수정하지 않는 경우
+    } else if(command == "stay") {
+        result = await User.findByIdAndUpdate(userId, {$set: updatedData}, {new: true});
     } else {
         const error = new NotFoundError("Command not found");
         throw error;
+    }
+
+    //수정 할 사용자 조회 실패 시
+    if (!result) {
+        throw new NotFoundError("User not found for update");
     }
     return result;
 };
 
 exports.deleteUser = async (userId) => {
-    const result = await User.findByIdAndDelete(userId);
+    try{
+        const result = await User.findByIdAndDelete(userId);
         if(!result){
-            throw new ServerError("Delete failure");
+            throw new NotFoundError("User not found for deletion");
         } 
         return result;
+    } catch {
+        throw new ServerError("Delete failure");
+    }
     };

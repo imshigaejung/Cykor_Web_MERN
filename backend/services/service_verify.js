@@ -1,15 +1,16 @@
 const bcrypt = require('bcrypt');
-const { findById } = require('../schema/room_schema');
-const { NotFoundError } = require('./service_error');
+const User = require('../schema/user_schema');
+const Room = require('../schema/room_schema');
+const { NotFoundError, UnauthorizedError } = require('./service_error');
 
 
 exports.verifyUserstringId = async(userstringId) =>{
     let result = await User.findOne({id: userstringId});
     if(result){
-        return true;
+        return result;
     }
     else{
-        return false;
+        return undefined;
     }
 }
 
@@ -20,7 +21,7 @@ exports.verifyPassword = async(inputPassword, userPassword) =>{
 exports.verifyHost = async(roomId, userId) =>{
     const currentRoom = await Room.findById(roomId);
     if(!currentRoom){
-        throw NotFoundError("Room not found");
+        throw new NotFoundError("Room not found");
     }
     if(currentRoom.host == userId){
         return true;
@@ -28,4 +29,11 @@ exports.verifyHost = async(roomId, userId) =>{
     else{
         return false;
     }
+}
+
+exports.verifyIsLogin = async(req, res, next) => {
+    if(!req.session.userId){
+        return next(new UnauthorizedError("Login Required"));
+    }
+    next();
 }

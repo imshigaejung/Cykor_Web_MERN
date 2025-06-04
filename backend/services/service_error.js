@@ -22,4 +22,12 @@ class BadRequestError extends ServerError {
     }
 }
 
-module.exports = { ServerError, NotFoundError, BadRequestError };
+class UnauthorizedError extends ServerError {
+    constructor(message = "No authentication") {
+        super(message);
+        this.name = this.constructor.name;
+        this.statusCode = 401;
+    }
+}
+
+module.exports = { ServerError, NotFoundError, BadRequestError, UnauthorizedError };

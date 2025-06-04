@@ -1,9 +1,9 @@
-const Room = require('../schema/room_schema');
 const userService = require('../services/service_user');
 const roomService = require('../services/service_room');
 const verify = require('../services/service_verify');
 const { BadRequestError } = require('../services/service_error');
 
+//post
 exports.makeRoom = async (req, res, next) => {
     try{
         const roomData = req.body;
@@ -11,22 +11,24 @@ exports.makeRoom = async (req, res, next) => {
         //생성성 성공
         return res.status(201).json({message: "Creation complete"});
     } catch(error) {
-        return res.status(error.statusCode).json({error: error.message});
+        next(error);
     }
     
 };
 
+//get
 exports.profileRoom = async (req, res, next) => {
     try{
         const roomId = req.params.id;
-        await roomService.readRoom("_id", roomId);
+        const roomInfo = await roomService.readRoom("_id", roomId);
         //불러오기 성공
-        return res.status(200).json({message: "Reading Complete"});
+        return res.status(200).json({message: "Reading Complete", data: roomInfo});
     } catch(error) {
-        return res.status(error.statusCode).json({error: error.message});
+        next(error);
     }
 };
 
+//patch
 exports.inviteToRoom = async (req, res, next) => {
     try{
         const roomId = req.params.id;
@@ -40,15 +42,16 @@ exports.inviteToRoom = async (req, res, next) => {
             userIds.map(userId => userService.updateUser(userId, {myRooms: [roomId]}, "insert")),
         );
         //방 정보에 초대 된 사용자 정보 저장
-        await roomService.updateRoom(roomId, {members: [userIds]}, "insert");   
+        await roomService.updateRoom(roomId, {members: userIds}, "insert");   
 
         //수정 성공
         return res.status(200).json({message: 'Update complete'});
     } catch(error) {
-        return res.status(error.statusCode).json({error: error.message});
+        next(error);
     }
 };
 
+//delete
 exports.destroyRoom = async (req, res, next) => {
     try{
         const roomId = req.params.id;
@@ -66,10 +69,11 @@ exports.destroyRoom = async (req, res, next) => {
         }
         
     } catch(error) {
-        return res.status(error.statusCode).json({error: error.message});
+       next(error);
     }
 };
 
+//get
 exports.listRoom = async(req, res, next) => {
     try{
         const currentUser = await userService.readUser("_id",req.session.userId);
@@ -80,8 +84,8 @@ exports.listRoom = async(req, res, next) => {
                 return myRoom.name;
             }),
         );
-        return res.status(200).json({message: "Listing my rooms complete"});
+        return res.status(200).json({message: "Listing my rooms complete", data: myRoomNames});
     } catch(error) {
-        return res.status(error.statusCode).json({error: error.message});
+       next(error);
     }
 }

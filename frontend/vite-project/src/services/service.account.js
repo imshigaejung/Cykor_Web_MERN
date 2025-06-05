@@ -8,3 +8,6 @@ export const accountSignup = (userData) =>
 
 export const accountLogout = () =>
     api.delete(`/account/logout`);
+
+export const accountCurrentUser = () => 
+    api.get('/session/me');

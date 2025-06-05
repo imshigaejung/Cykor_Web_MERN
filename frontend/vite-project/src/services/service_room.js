@@ -15,3 +15,7 @@ export const destroyRoom = (roomId) =>
 export const listRoom = () =>
     api.get('/room/list');
 
+export const leaveRoom = (roomId) =>
+    api.delete(`/room/leave/${roomId}`);
+
+

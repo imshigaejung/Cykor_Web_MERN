@@ -7,7 +7,7 @@ const verify = require('../services/service_verify');
 exports.profileUser = async (req, res, next) => {
     try{
         const userId = req.params.id;
-        const userInfo = await userService.readUser("_id", userId)
+        const userInfo = await userService.readUser("_id", userId);
         //불러오기 성공
         return res.status(200).json({message: "Profile loading complete", data: userInfo});
     } catch(error) {

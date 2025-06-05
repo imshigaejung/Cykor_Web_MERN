@@ -13,6 +13,9 @@ console.log("route entered!");
 router.use('/account',accountRouter);
 
 router.use(verify.verifyIsLogin);
+router.get('/session/me', (req,res) => {
+    res.json({userId: req.session.userId});
+})
 
 router.use('/user',userRouter);
 router.use('/room',roomRouter);

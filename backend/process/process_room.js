@@ -21,8 +21,16 @@ exports.profileRoom = async (req, res, next) => {
     try{
         const roomId = req.params.id;
         const roomInfo = await roomService.readRoom("_id", roomId);
+        const memberNames = await Promise.all(
+            roomInfo.members.map(async memberId => {
+                const member = await userService.readUser("_id", memberId);
+                return member.name;
+            }),
+        );
+        const hostName = await userService.readUser("_id", roomInfo.host);
+        const roomData = {...roomInfo, memberNames: memberNames, hostName: hostName};
         //불러오기 성공
-        return res.status(200).json({message: "Reading Complete", data: roomInfo});
+        return res.status(200).json({message: "Reading Complete", data: roomData});
     } catch(error) {
         next(error);
     }

@@ -27,13 +27,13 @@ exports.listFriends = async(req, res, next) => {
     try{
         const currentUser = await userService.readUser("_id",req.session.userId);
         const friendsId = currentUser.friends;
-        const friendNames = await Promise.all(
+        const friendsInfo = await Promise.all(
             friendsId.map(async friendId => {
                 const friend = await userService.readUser("_id", friendId)
-                return friend.name;
+                return {name: friend.name, userId: friendId};
             }),
         );
-        return res.status(200).json({message: "Listing friend complete", });
+        return res.status(200).json({message: "Listing friend complete", data: friendsInfo});
     } catch(error) {
         next(error);
     }

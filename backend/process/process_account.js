@@ -6,6 +6,7 @@ const verify = require('../services/service_verify');
 //post
 exports.accountSignup = async (req, res, next) => {
     try{
+        console.log("acountafaefeafawef12345678965");
         //사용자 정보 - 문자 Id, 비밀번호
         const userData = req.body;
         //빈 값인지 확인하는 구문
@@ -18,7 +19,7 @@ exports.accountSignup = async (req, res, next) => {
         if(user){
             throw new BadRequestError('Existing name');
         } else {
-        await userService.createUser(userData)
+        await userService.createUser(userData);
         //생성 성공
         return res.status(201).json({message: "Creation complete"});
         }
@@ -29,6 +30,7 @@ exports.accountSignup = async (req, res, next) => {
 
 //post
 exports.accountLogin = async (req, res, next) => {
+    console.log("acountafaefeafawef12345678965");
     try{
         //사용자 정보 - 문자 Id, 비밀번호
         const userData = req.body;

@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
 
 //connection - cors setting
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 //db connection
 connectDB();
@@ -30,10 +30,6 @@ app.use(session({
 app.use('/api',routes);
 app.use((err, req, res, next) => {
   res.status(err.statusCode).json({error: err.message});
-});
-//root dir process
-app.get('/', (req, res) => {
-  res.send('Main Page');
 });
 
 app.listen(5001, ()=>{

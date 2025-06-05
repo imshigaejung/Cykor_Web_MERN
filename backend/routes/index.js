@@ -10,12 +10,15 @@ const verify = require('../services/service_verify');
 
 
 console.log("route entered!");
-router.use('/account',accountRouter);
+router.use('/account', (req,res,next) => {
+    console.log(">> /account 진입");
+    next();
+},accountRouter);
 
 router.use(verify.verifyIsLogin);
 router.get('/session/me', (req,res) => {
     res.json({userId: req.session.userId});
-})
+}, accountRouter);
 
 router.use('/user',userRouter);
 router.use('/room',roomRouter);

@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {makeMessage, listMessage} from '../services/service_message';
-import { accountCurrentUser } from '../services/service.account';
+import { accountCurrentUser } from '../services/service_account';
 
 //route : /room/:roomId
 function InputChat(){

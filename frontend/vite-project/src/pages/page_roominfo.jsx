@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { accountCurrentUser } from '../services/service.account';
+import { accountCurrentUser } from '../services/service_account';
 import {profileRoom} from '../services/service_room';
 
 async function ShowRoomInfo(){

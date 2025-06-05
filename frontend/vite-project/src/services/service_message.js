@@ -1,8 +1,8 @@
 import api from "../api/api";
 
 export const makeMessage = (messageData) =>
-    api.post('/message/make', messageData);
+    api.post('/api/message/make', messageData);
 
 export const listMessage = (roomId) =>
-    api.get(`/message/list/${roomId}`);
+    api.get(`/api/message/list/${roomId}`);
 

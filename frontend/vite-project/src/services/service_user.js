@@ -1,12 +1,12 @@
 import api from "../api/api";
 
 export const profileUser = (userId) =>
-    api.get(`/user/profile/${userId}`);
+    api.get(`/api/user/profile/${userId}`);
 
 export const searchUser = (userName) =>
-    api.get('/user/search',{
+    api.get('/api/user/search',{
         params: {userName: userName}
     });
 
 export const editUser = (userData) =>
-    api.patch(`/user/edit`, userData);
+    api.patch(`/api/user/edit`, userData);

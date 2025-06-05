@@ -1,21 +1,21 @@
 import api from "../api/api";
 
 export const makeRoom = (roomData) =>
-    api.post('/room/make', roomData);
+    api.post('/api/room/make', roomData);
 
 export const profileRoom = (roomId) =>
-    api.get(`/room/profile/${roomId}`);
+    api.get(`/api/room/profile/${roomId}`);
 
 export const inviteToRoom = (roomId, usersId) =>
-    api.patch(`/room/invite/${roomId}`, usersId);
+    api.patch(`/api/room/invite/${roomId}`, usersId);
 
 export const destroyRoom = (roomId) =>
-    api.delete(`/room/delete/${roomId}`);
+    api.delete(`/api/room/delete/${roomId}`);
 
 export const listRoom = () =>
-    api.get('/room/list');
+    api.get('/api/room/list');
 
 export const leaveRoom = (roomId) =>
-    api.delete(`/room/leave/${roomId}`);
+    api.delete(`/api/room/leave/${roomId}`);
 
 

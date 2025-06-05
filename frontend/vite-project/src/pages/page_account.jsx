@@ -36,8 +36,9 @@ async function handleSubmit(event, action, setAction, navigate){
                 navigate(-1);
             }
         }
-    } catch {
+    } catch(error) {
         alert('Unexpected error: location: 1');
+        console.error(error); 
     }
 }
 
@@ -46,19 +47,19 @@ function InputUserinfo(props){
         <form onSubmit={(event) => handleSubmit(event, props.mode, props.changeMode, props.navigate)}>
                 <p><input type='text' name='stringId' placeholder='id'/></p>
                 <p><input type='password' name='password' placeholder='pw'/></p>
-                <p><input type='submit' value={props.mode}/></p>        
+                <p><input type='submit'value={props.mode}/></p>        
         </form>
     )
 }
 
-export default function Account(props){   
+export default function Account(){   
     const [action, setAction] = useState('Login');
     const navigate = useNavigate();
     return (
         <>        
         <h3>{action}</h3>
         <div>
-            <InputUserinfo mode={action} changeMode={setAction} navigate={navigate} />
+            <InputUserinfo mode={action} changeMode={setAction} navigate={navigate}/>
             <button onClick={() => setAction((action === 'Login')?'Signup':'Login')}>
                 {(action === 'Login')?'Go to Sign up':'Go to Login'}
             </button>
